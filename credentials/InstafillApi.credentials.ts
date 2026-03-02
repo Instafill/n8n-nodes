@@ -8,7 +8,9 @@ import type {
 export class InstafillApi implements ICredentialType {
 	name = 'instafillApi';
 
-	displayName = 'Instafill API';
+	displayName = 'Instafill.ai API';
+
+	icon = 'file:../icons/instafill.svg' as const;
 
 	documentationUrl = 'https://api.instafill.ai/swagger/index.html';
 
