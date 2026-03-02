@@ -1,13 +1,14 @@
 import type {
 	IDataObject,
 	IHookFunctions,
-	IHttpRequestOptions,
 	INodeType,
 	INodeTypeDescription,
 	IWebhookFunctions,
 	IWebhookResponseData,
 } from 'n8n-workflow';
 import { NodeConnectionTypes } from 'n8n-workflow';
+
+import { instafillApiRequest } from './shared/transport';
 
 export class InstafillTrigger implements INodeType {
 	description: INodeTypeDescription = {
@@ -68,20 +69,14 @@ export class InstafillTrigger implements INodeType {
 				const webhookData = this.getWorkflowStaticData('node');
 				const event = this.getNodeParameter('event', 0) as string;
 
-				const options: IHttpRequestOptions = {
-					method: 'POST',
-					url: 'https://api.instafill.ai/v1/integrations/n8n/hooks/subscribe',
-					body: {
+				const response = (await instafillApiRequest.call(
+					this,
+					'POST',
+					'/v1/integrations/n8n/hooks/subscribe',
+					{
 						hookUrl: webhookUrl,
 						event_type: event,
 					},
-					json: true,
-				};
-
-				const response = (await this.helpers.httpRequestWithAuthentication.call(
-					this,
-					'instafillApi',
-					options,
 				)) as IDataObject;
 
 				webhookData.webhookId = response.id as string;
@@ -96,17 +91,11 @@ export class InstafillTrigger implements INodeType {
 					return true;
 				}
 
-				const options: IHttpRequestOptions = {
-					method: 'DELETE',
-					url: `https://api.instafill.ai/v1/integrations/n8n/hooks/${webhookId}`,
-					json: true,
-				};
-
 				try {
-					await this.helpers.httpRequestWithAuthentication.call(
+					await instafillApiRequest.call(
 						this,
-						'instafillApi',
-						options,
+						'DELETE',
+						`/v1/integrations/n8n/hooks/${webhookId}`,
 					);
 				} catch {
 					return false;

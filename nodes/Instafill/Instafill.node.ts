@@ -1,12 +1,16 @@
 import type {
 	IDataObject,
 	IExecuteFunctions,
-	IHttpRequestOptions,
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeConnectionTypes } from 'n8n-workflow';
+import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
+
+import { checkIfFlatDescription } from './operations/checkIfFlat';
+import { convertPdfDescription } from './operations/covertPdf';
+import { getConversionStatusDescription } from './operations/getConversionStatus';
+import { instafillApiRequest } from './shared/transport';
 
 export class Instafill implements INodeType {
 	description: INodeTypeDescription = {
@@ -57,112 +61,9 @@ export class Instafill implements INodeType {
 				],
 				default: 'convertPdf',
 			},
-
-			// Convert PDF fields
-			{
-				displayName: 'Input Binary Field',
-				name: 'binaryPropertyName',
-				type: 'string',
-				default: 'data',
-				required: true,
-				displayOptions: {
-					show: {
-						operation: ['convertPdf'],
-					},
-				},
-				description: 'The name of the input binary field containing the PDF file to convert',
-			},
-			{
-				displayName: 'Options',
-				name: 'options',
-				type: 'collection',
-				placeholder: 'Add Option',
-				default: {},
-				displayOptions: {
-					show: {
-						operation: ['convertPdf'],
-					},
-				},
-				options: [
-					{
-						displayName: 'Allow Checkboxes',
-						name: 'allowCheckboxes',
-						type: 'boolean',
-						default: true,
-						description: 'Whether to detect checkboxes in the PDF',
-					},
-					{
-						displayName: 'Auto Confirm',
-						name: 'autoConfirm',
-						type: 'boolean',
-						default: false,
-						description: 'Whether to automatically confirm detected fields',
-					},
-					{
-						displayName: 'Confidence',
-						name: 'confidence',
-						type: 'number',
-						typeOptions: {
-							minValue: 0,
-							maxValue: 1,
-							numberStepSize: 0.1,
-						},
-						default: 0.1,
-						description: 'Confidence threshold for field detection',
-					},
-					{
-						displayName: 'Pages',
-						name: 'pages',
-						type: 'string',
-						default: '',
-						description: 'Specific pages to convert (e.g., "1,3,5" or "1-3"',
-					},
-					{
-						displayName: 'Resolution',
-						name: 'resolution',
-						type: 'number',
-						default: 1600,
-						description: 'Image resolution for processing',
-					},
-					{
-						displayName: 'Use Cache',
-						name: 'useCache',
-						type: 'boolean',
-						default: true,
-						description: 'Whether to use cached results if available',
-					},
-				],
-			},
-
-			// Get Conversion Status fields
-			{
-				displayName: 'Job ID',
-				name: 'jobId',
-				type: 'string',
-				default: '',
-				required: true,
-				displayOptions: {
-					show: {
-						operation: ['getConversionStatus'],
-					},
-				},
-				description: 'The ID of the conversion job to check',
-			},
-
-			// Check If Flat fields
-			{
-				displayName: 'Input Binary Field',
-				name: 'binaryPropertyName',
-				type: 'string',
-				default: 'data',
-				required: true,
-				displayOptions: {
-					show: {
-						operation: ['checkIfFlat'],
-					},
-				},
-				description: 'The name of the input binary field containing the PDF file to check',
-			},
+			...convertPdfDescription,
+			...getConversionStatusDescription,
+			...checkIfFlatDescription,
 		],
 	};
 
@@ -185,22 +86,17 @@ export class Instafill implements INodeType {
 					if (options.allowCheckboxes !== undefined) qs.allow_checkboxes = options.allowCheckboxes;
 					if (options.autoConfirm !== undefined) qs.auto_confirm = options.autoConfirm;
 
-					const requestOptions: IHttpRequestOptions = {
-						method: 'POST',
-						url: 'https://api.instafill.ai/v1/utils/convert',
-						body: binaryData,
-						headers: {
+					const response = await instafillApiRequest.call(
+						this,
+						'POST',
+						'/v1/utils/convert',
+						binaryData,
+						qs,
+						{
 							'Content-Type': 'application/pdf',
 							'X-Use-Cache': String(options.useCache ?? true),
 						},
-						qs,
-						json: true,
-					};
-
-					const response = await this.helpers.httpRequestWithAuthentication.call(
-						this,
-						'instafillApi',
-						requestOptions,
+						false,
 					);
 
 					const responseData = typeof response === 'string' ? JSON.parse(response) : response;
@@ -214,16 +110,10 @@ export class Instafill implements INodeType {
 				if (operation === 'getConversionStatus') {
 					const jobId = this.getNodeParameter('jobId', i) as string;
 
-					const requestOptions: IHttpRequestOptions = {
-						method: 'GET',
-						url: `https://api.instafill.ai/v1/utils/convert/${jobId}/status`,
-						json: true,
-					};
-
-					const response = await this.helpers.httpRequestWithAuthentication.call(
+					const response = await instafillApiRequest.call(
 						this,
-						'instafillApi',
-						requestOptions,
+						'GET',
+						`/v1/utils/convert/${jobId}/status`,
 					);
 
 					const executionData = this.helpers.constructExecutionMetaData(
@@ -237,20 +127,14 @@ export class Instafill implements INodeType {
 					const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
 					const binaryData = await this.helpers.getBinaryDataBuffer(i, binaryPropertyName);
 
-					const requestOptions: IHttpRequestOptions = {
-						method: 'POST',
-						url: 'https://api.instafill.ai/v1/utils/check-flat',
-						body: binaryData,
-						headers: {
-							'Content-Type': 'application/pdf',
-						},
-						json: false,
-					};
-
-					const response = await this.helpers.httpRequestWithAuthentication.call(
+					const response = await instafillApiRequest.call(
 						this,
-						'instafillApi',
-						requestOptions,
+						'POST',
+						'/v1/utils/check-flat',
+						binaryData,
+						{},
+						{ 'Content-Type': 'application/pdf' },
+						false,
 					);
 
 					const responseData = typeof response === 'string' ? JSON.parse(response) : response;
@@ -269,7 +153,9 @@ export class Instafill implements INodeType {
 					returnData.push(...executionData);
 					continue;
 				}
-				throw error;
+				throw new NodeOperationError(this.getNode(), error as Error, {
+					itemIndex: i,
+				});
 			}
 		}
 
