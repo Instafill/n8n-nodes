@@ -4,8 +4,9 @@ import type {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
+	JsonObject,
 } from 'n8n-workflow';
-import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
+import { NodeApiError, NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
 import { checkIfFlatDescription } from './operations/checkIfFlat';
 import { convertPdfDescription } from './operations/convertPdf';
@@ -79,6 +80,14 @@ export class Instafill implements INodeType {
 					const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
 					const options = this.getNodeParameter('options', i) as IDataObject;
 					const binaryData = await this.helpers.getBinaryDataBuffer(i, binaryPropertyName);
+
+					if (binaryData.length === 0) {
+						throw new NodeOperationError(this.getNode(), 'The PDF file is empty', {
+							description: 'The input binary field contains an empty file. Please provide a valid PDF.',
+							itemIndex: i,
+						});
+					}
+
 					const qs: IDataObject = {};
 
 					if (options.pages) qs.pages = options.pages;
@@ -101,15 +110,21 @@ export class Instafill implements INodeType {
 					);
 
 					const responseData = typeof response === 'string' ? JSON.parse(response) : response;
-					const executionData = this.helpers.constructExecutionMetaData(
-						this.helpers.returnJsonArray(responseData as IDataObject),
-						{ itemData: { item: i } },
-					);
-					returnData.push(...executionData);
+					returnData.push(...this.helpers.returnJsonArray(responseData as IDataObject).map((item) => ({
+						...item,
+						pairedItem: { item: i },
+					})));
 				}
 
 				if (operation === 'getConversionStatus') {
 					const jobId = this.getNodeParameter('jobId', i) as string;
+
+					if (!jobId.trim()) {
+						throw new NodeOperationError(this.getNode(), 'Job ID is required', {
+							description: 'Please provide a valid Job ID to check the conversion status.',
+							itemIndex: i,
+						});
+					}
 
 					const response = await instafillApiRequest.call(
 						this,
@@ -117,16 +132,22 @@ export class Instafill implements INodeType {
 						`/v1/utils/convert/${jobId}/status`,
 					);
 
-					const executionData = this.helpers.constructExecutionMetaData(
-						this.helpers.returnJsonArray(response as IDataObject),
-						{ itemData: { item: i } },
-					);
-					returnData.push(...executionData);
+					returnData.push(...this.helpers.returnJsonArray(response as IDataObject).map((item) => ({
+						...item,
+						pairedItem: { item: i },
+					})));
 				}
 
 				if (operation === 'checkIfFlat') {
 					const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
 					const binaryData = await this.helpers.getBinaryDataBuffer(i, binaryPropertyName);
+
+					if (binaryData.length === 0) {
+						throw new NodeOperationError(this.getNode(), 'The PDF file is empty', {
+							description: 'The input binary field contains an empty file. Please provide a valid PDF.',
+							itemIndex: i,
+						});
+					}
 
 					const response = await instafillApiRequest.call(
 						this,
@@ -139,22 +160,25 @@ export class Instafill implements INodeType {
 					);
 
 					const responseData = typeof response === 'string' ? JSON.parse(response) : response;
-					const executionData = this.helpers.constructExecutionMetaData(
-						this.helpers.returnJsonArray(responseData as IDataObject),
-						{ itemData: { item: i } },
-					);
-					returnData.push(...executionData);
+					returnData.push(...this.helpers.returnJsonArray(responseData as IDataObject).map((item) => ({
+						...item,
+						pairedItem: { item: i },
+					})));
 				}
 			} catch (error) {
 				if (this.continueOnFail()) {
-					const executionData = this.helpers.constructExecutionMetaData(
-						this.helpers.returnJsonArray({ error: (error as Error).message }),
-						{ itemData: { item: i } },
-					);
-					returnData.push(...executionData);
+					returnData.push({
+						json: { error: (error as Error).message },
+						pairedItem: { item: i },
+					});
 					continue;
 				}
-				throw new NodeOperationError(this.getNode(), error as Error, {
+
+				if (error instanceof NodeOperationError) {
+					throw error;
+				}
+
+				throw new NodeApiError(this.getNode(), error as JsonObject, {
 					itemIndex: i,
 				});
 			}
