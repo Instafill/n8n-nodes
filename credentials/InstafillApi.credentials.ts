@@ -28,7 +28,7 @@ export class InstafillApi implements ICredentialType {
 		type: 'generic',
 		properties: {
 			headers: {
-				'X-API-Key': '={{$credentials.apiKey}}',
+				Authorization: '=Bearer {{$credentials.apiKey}}',
 			},
 		},
 	};
