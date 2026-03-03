@@ -29,8 +29,8 @@ export async function execute(this: IExecuteFunctions, i: number): Promise<INode
 	const jobId = this.getNodeParameter('jobId', i) as string;
 
 	if (!jobId.trim()) {
-		throw new NodeOperationError(this.getNode(), 'Job ID is required', {
-			description: 'Please provide a valid Job ID to check the conversion status.',
+		throw new NodeOperationError(this.getNode(), `The parameter 'Job ID' is empty`, {
+			description: `Please provide a valid Job ID in the 'Job ID' field to check the conversion status.`,
 			itemIndex: i,
 		});
 	}

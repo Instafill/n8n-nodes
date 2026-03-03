@@ -30,7 +30,7 @@ export async function execute(this: IExecuteFunctions, i: number): Promise<INode
 
 	if (binaryData.length === 0) {
 		throw new NodeOperationError(this.getNode(), 'The PDF file is empty', {
-			description: 'The input binary field contains an empty file. Please provide a valid PDF.',
+			description: `The field 'Input Data Field Name' contains an empty file. Please provide a valid PDF.`,
 			itemIndex: i,
 		});
 	}

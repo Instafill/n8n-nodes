@@ -42,6 +42,20 @@ You can find your API key in your [workspace API settings](https://instafill.ai/
 2. Paste your API key into the **API Key** field.
 3. Click **Save** — n8n will verify the key automatically.
 
+## Example Workflow
+
+**Convert a flat PDF into a fillable form and wait for the result:**
+
+1. **Read Binary File** — Load a PDF from disk or an HTTP request.
+2. **Instafill.ai (Convert PDF)** — Send the PDF for conversion. Returns a job ID.
+3. **Wait** — Pause the workflow (e.g. 30 seconds) to allow processing.
+4. **Instafill.ai (Get Conversion Status)** — Pass the job ID to check if conversion is complete. The response includes the status and a link to review the result on Instafill.ai.
+
+**Alternatively, use the trigger node:**
+
+1. **Instafill.ai Trigger (Form Converted)** — Starts the workflow automatically when a conversion completes.
+2. Process the trigger payload in subsequent nodes (e.g. send a notification, update a database).
+
 ## Compatibility
 
 Tested against n8n version 1.x. No known incompatibilities.

@@ -48,8 +48,8 @@ export class InstafillTrigger implements INodeType {
 					{
 						name: 'Form Converted',
 						value: 'form_converted',
-						description: 'Triggers when a PDF form conversion completes',
-						action: 'Triggers when a PDF form conversion completes',
+						description: 'Triggers when PDF form conversion completes',
+						action: 'Triggers when PDF form conversion completes',
 					},
 				],
 				default: 'form_converted',
