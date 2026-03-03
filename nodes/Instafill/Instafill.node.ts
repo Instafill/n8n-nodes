@@ -43,6 +43,12 @@ export class Instafill implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
+						name: 'Check If Flat',
+						value: 'checkIfFlat',
+						description: 'Check whether a PDF form is flat or fillable',
+						action: 'Check whether a PDF form is flat or fillable',
+					},
+					{
 						name: 'Convert PDF',
 						value: 'convertPdf',
 						description: 'Convert a flat PDF form into a fillable one',
@@ -53,12 +59,6 @@ export class Instafill implements INodeType {
 						value: 'getConversionStatus',
 						description: 'Get the status of a PDF conversion job',
 						action: 'Get the status of a PDF conversion job',
-					},
-					{
-						name: 'Check If Flat',
-						value: 'checkIfFlat',
-						description: 'Check whether a PDF form is flat or fillable',
-						action: 'Check whether a PDF form is flat or fillable',
 					},
 				],
 				default: 'convertPdf',
@@ -83,7 +83,8 @@ export class Instafill implements INodeType {
 
 					if (binaryData.length === 0) {
 						throw new NodeOperationError(this.getNode(), 'The PDF file is empty', {
-							description: 'The input binary field contains an empty file. Please provide a valid PDF.',
+							description:
+								'The input binary field contains an empty file. Please provide a valid PDF.',
 							itemIndex: i,
 						});
 					}
@@ -110,10 +111,12 @@ export class Instafill implements INodeType {
 					);
 
 					const responseData = typeof response === 'string' ? JSON.parse(response) : response;
-					returnData.push(...this.helpers.returnJsonArray(responseData as IDataObject).map((item) => ({
-						...item,
-						pairedItem: { item: i },
-					})));
+					returnData.push(
+						...this.helpers.returnJsonArray(responseData as IDataObject).map((item) => ({
+							...item,
+							pairedItem: { item: i },
+						})),
+					);
 				}
 
 				if (operation === 'getConversionStatus') {
@@ -130,12 +133,16 @@ export class Instafill implements INodeType {
 						this,
 						'GET',
 						`/v1/utils/convert/${jobId}/status`,
-					);
+					) as IDataObject;
 
-					returnData.push(...this.helpers.returnJsonArray(response as IDataObject).map((item) => ({
-						...item,
-						pairedItem: { item: i },
-					})));
+					delete response.base64;
+
+					returnData.push(
+						...this.helpers.returnJsonArray(response).map((item) => ({
+							...item,
+							pairedItem: { item: i },
+						})),
+					);
 				}
 
 				if (operation === 'checkIfFlat') {
@@ -144,7 +151,8 @@ export class Instafill implements INodeType {
 
 					if (binaryData.length === 0) {
 						throw new NodeOperationError(this.getNode(), 'The PDF file is empty', {
-							description: 'The input binary field contains an empty file. Please provide a valid PDF.',
+							description:
+								'The input binary field contains an empty file. Please provide a valid PDF.',
 							itemIndex: i,
 						});
 					}
@@ -160,10 +168,12 @@ export class Instafill implements INodeType {
 					);
 
 					const responseData = typeof response === 'string' ? JSON.parse(response) : response;
-					returnData.push(...this.helpers.returnJsonArray(responseData as IDataObject).map((item) => ({
-						...item,
-						pairedItem: { item: i },
-					})));
+					returnData.push(
+						...this.helpers.returnJsonArray(responseData as IDataObject).map((item) => ({
+							...item,
+							pairedItem: { item: i },
+						})),
+					);
 				}
 			} catch (error) {
 				if (this.continueOnFail()) {

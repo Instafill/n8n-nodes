@@ -40,7 +40,7 @@ export class InstafillTrigger implements INodeType {
 		],
 		properties: [
 			{
-				displayName: 'Event',
+				displayName: 'Trigger On',
 				name: 'event',
 				type: 'options',
 				noDataExpression: true,
@@ -54,7 +54,6 @@ export class InstafillTrigger implements INodeType {
 				],
 				default: 'form_converted',
 				required: true,
-				description: 'The event to listen for',
 			},
 		],
 	};
