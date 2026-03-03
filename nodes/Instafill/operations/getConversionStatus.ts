@@ -7,6 +7,7 @@ export const getConversionStatusDescription: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g., abc123def456abc123def456',
 		displayOptions: {
 			show: {
 				operation: ['getConversionStatus'],

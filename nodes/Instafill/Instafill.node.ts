@@ -8,7 +8,7 @@ import type {
 import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
 import { checkIfFlatDescription } from './operations/checkIfFlat';
-import { convertPdfDescription } from './operations/covertPdf';
+import { convertPdfDescription } from './operations/convertPdf';
 import { getConversionStatusDescription } from './operations/getConversionStatus';
 import { instafillApiRequest } from './shared/transport';
 
@@ -19,7 +19,8 @@ export class Instafill implements INodeType {
 		icon: 'file:../../icons/instafill.svg',
 		group: ['transform'],
 		version: 1,
-		subtitle: '={{$parameter["operation"]}}',
+		subtitle:
+			'={{ {"convertPdf": "Convert PDF", "getConversionStatus": "Get Conversion Status", "checkIfFlat": "Check If Flat"}[$parameter["operation"]] }}',
 		description: 'Interact with the Instafill.ai API',
 		defaults: {
 			name: 'Instafill.ai',

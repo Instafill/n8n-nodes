@@ -50,6 +50,7 @@ export const convertPdfDescription: INodeProperties[] = [
 					numberStepSize: 0.1,
 				},
 				default: 0.1,
+				hint: 'Lower values detect more fields but may include false positives',
 				description: 'Confidence threshold for field detection',
 			},
 			{
@@ -57,6 +58,7 @@ export const convertPdfDescription: INodeProperties[] = [
 				name: 'pages',
 				type: 'string',
 				default: '',
+				placeholder: 'e.g., 1,3,5 or 1-3',
 				description: 'Specific pages to convert (e.g. "1,3,5" or "1-3")',
 			},
 			{
@@ -64,6 +66,7 @@ export const convertPdfDescription: INodeProperties[] = [
 				name: 'resolution',
 				type: 'number',
 				default: 1600,
+				hint: 'Higher resolution improves accuracy but increases processing time',
 				description: 'Image resolution for processing',
 			},
 			{
