@@ -1,5 +1,9 @@
 # n8n-nodes-instafill
 
+[![npm version](https://img.shields.io/npm/v/n8n-nodes-instafill.svg)](https://www.npmjs.com/package/n8n-nodes-instafill)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![n8n community](https://img.shields.io/badge/n8n-community--node-orange)](https://www.npmjs.com/package/n8n-nodes-instafill)
+
 This is a n8n community node. It lets you use [Instafill.ai](https://instafill.ai) in your n8n workflows.
 
 Instafill.ai is an AI-powered form automation platform. It fills PDF and Word forms in seconds — extracting fields, mapping your data semantically, and completing forms automatically. Used by legal, insurance, healthcare, and finance teams to eliminate manual data entry at scale.
@@ -48,13 +52,13 @@ You can find your API key in your [workspace API settings](https://instafill.ai/
 
 1. **Read Binary File** — Load a PDF from disk or an HTTP request.
 2. **Instafill.ai (Convert PDF)** — Send the PDF for conversion. Returns a job ID.
-3. **Wait** — Pause the workflow (e.g. 30 seconds) to allow processing.
+3. **Wait** — Pause the workflow (e.g., 30 seconds) to allow processing.
 4. **Instafill.ai (Get Conversion Status)** — Pass the job ID to check if conversion is complete. The response includes the status and a link to review the result on Instafill.ai.
 
 **Alternatively, use the trigger node:**
 
 1. **Instafill.ai Trigger (Form Converted)** — Starts the workflow automatically when a conversion completes.
-2. Process the trigger payload in subsequent nodes (e.g. send a notification, update a database).
+2. Process the trigger payload in subsequent nodes (e.g., send a notification, update a database).
 
 ## Compatibility
 
