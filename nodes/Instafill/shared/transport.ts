@@ -4,12 +4,13 @@ import type {
 	IHookFunctions,
 	IHttpRequestMethods,
 	IHttpRequestOptions,
+	ILoadOptionsFunctions,
 } from 'n8n-workflow';
 
 const BASE_URL = 'https://api.instafill.ai';
 
 export async function instafillApiRequest(
-	this: IExecuteFunctions | IHookFunctions,
+	this: IExecuteFunctions | IHookFunctions | ILoadOptionsFunctions,
 	method: IHttpRequestMethods,
 	resource: string,
 	body?: Buffer | IDataObject,

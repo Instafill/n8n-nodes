@@ -1,3 +1,5 @@
 .idea
+.firecrawl
+.docs
 dist
 node_modules
