@@ -6,6 +6,7 @@ interface FormListItem {
 	form_id: string;
 	formName: string;
 	processed: boolean;
+	status: string;
 }
 
 export async function getForms(
@@ -18,7 +19,7 @@ export async function getForms(
 		const forms = response.forms || [];
 
 		return forms
-			.filter((form) => form.processed)
+			.filter((form) => form.processed && form.status === 'Active')
 			.map((form) => ({
 				name: form.formName,
 				value: form.form_id,

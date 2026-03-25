@@ -75,7 +75,7 @@ export async function execute(
 		{ q: query, limit: String(limit) },
 	)) as { forms: FormSearchItem[] };
 
-	const forms = response.forms || [];
+	const forms = (response.forms || []).filter((form) => form.status === 'Active');
 
 	return forms.map((form) => ({
 		json: {
