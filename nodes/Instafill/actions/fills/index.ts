@@ -19,8 +19,8 @@ export const fillsOperations: INodeProperties = {
 		{
 			name: 'Create',
 			value: 'create',
-			description: 'Fill a PDF form with data from provided sources using AI',
-			action: 'Fill form with data from provided sources',
+			description: 'Create a new fill for a form with data from provided sources',
+			action: 'Create a fill from provided sources',
 		},
 		{
 			name: 'Get',

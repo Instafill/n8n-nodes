@@ -38,7 +38,7 @@ export class Instafill implements INodeType {
 		displayName: 'Instafill.ai',
 		name: 'instafill',
 		icon: 'file:../../icons/instafill.svg',
-		group: ['transform'],
+		group: [],
 		version: [1, 2],
 		subtitle:
 			'={{ $parameter["resource"] ? $parameter["operation"] + ": " + $parameter["resource"] : {"convertPdf": "Convert PDF", "getConversionStatus": "Get Conversion Status", "checkIfFlat": "Check If Flat"}[$parameter["operation"]] }}',

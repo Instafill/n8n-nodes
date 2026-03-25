@@ -9,6 +9,12 @@ import type {
 
 const BASE_URL = 'https://api.instafill.ai';
 
+const STATUS_MESSAGES: Record<number, string> = {
+	401: 'Invalid API key. Please check your Instafill.ai credentials.',
+	403: 'Access denied. Your API key does not have permission for this action.',
+	429: 'Too many requests. Please wait a moment and try again.',
+}
+
 export async function instafillApiRequest(
 	this: IExecuteFunctions | IHookFunctions | ILoadOptionsFunctions,
 	method: IHttpRequestMethods,
@@ -30,5 +36,19 @@ export async function instafillApiRequest(
 		options.body = body;
 	}
 
-	return this.helpers.httpRequestWithAuthentication.call(this, 'instafillApi', options);
+	try {
+		return await this.helpers.httpRequestWithAuthentication.call(
+			this,
+			'instafillApi',
+			options,
+		);
+	} catch (error) {
+		const statusCode = (error as { httpCode?: string }).httpCode;
+
+		if (statusCode && STATUS_MESSAGES[Number(statusCode)]) {
+			(error as Error).message = STATUS_MESSAGES[Number(statusCode)];
+		}
+
+		throw error;
+	}
 }

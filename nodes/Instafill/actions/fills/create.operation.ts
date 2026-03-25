@@ -98,12 +98,25 @@ export async function execute(
 
 	const fileUrlsParam = this.getNodeParameter('fileUrls', i, {}) as IDataObject;
 	const urlItems = (fileUrlsParam.urlItem as IDataObject[]) || [];
-	const validUrls = urlItems
+	const urls = urlItems
 		.map((item) => (item.url as string) || '')
-		.filter((url) => url.startsWith('https'));
+		.filter((url) => url.length > 0);
 
-	if (validUrls.length > 0) {
-		body.file_urls = validUrls;
+	const invalidUrls = urls.filter((url) => !url.startsWith('https'));
+
+	if (invalidUrls.length > 0) {
+		throw new NodeOperationError(
+			this.getNode(),
+			'Source file URLs must use HTTPS',
+			{
+				description: `The following URLs are not HTTPS: ${invalidUrls.join(', ')}. All source file URLs must start with https://.`,
+				itemIndex: i,
+			},
+		);
+	}
+
+	if (urls.length > 0) {
+		body.file_urls = urls;
 	}
 
 	const textInfo = this.getNodeParameter('textInfo', i, '') as string;

@@ -19,8 +19,8 @@ export const formsOperations: INodeProperties = {
 		{
 			name: 'Get Many',
 			value: 'getMany',
-			description: 'Search for forms in your workspace by name',
-			action: 'Search for forms in workspace',
+			description: 'Retrieve a list of forms matching a search query',
+			action: 'Get many forms in workspace',
 		},
 		{
 			name: 'Upload',

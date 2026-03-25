@@ -66,7 +66,7 @@ export const description: INodeProperties[] = [
 				name: 'pages',
 				type: 'string',
 				default: '',
-				placeholder: 'e.g., 1,3,5 or 1-3',
+				placeholder: 'e.g. 1,3,5 or 1-3',
 				description: 'Specific pages to convert (e.g. "1,3,5" or "1-3")',
 			},
 			{

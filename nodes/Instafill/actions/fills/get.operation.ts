@@ -55,7 +55,14 @@ export async function execute(
 		)) as IDataObject;
 	} catch (error) {
 		if ((error as NodeApiError).httpCode === '404') {
-			return [];
+			throw new NodeOperationError(
+				this.getNode(),
+				'Fill not found',
+				{
+					description: `No fill with ID '${fillId}' was found. Make sure the ID is correct.`,
+					itemIndex: i,
+				},
+			);
 		}
 
 		throw error;

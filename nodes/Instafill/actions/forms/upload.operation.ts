@@ -35,7 +35,7 @@ export const description: INodeProperties[] = [
 				operation: ['upload'],
 			},
 		},
-		placeholder: 'e.g., tax-form.pdf',
+		placeholder: 'e.g. tax-form.pdf',
 		description:
 			'Name for the uploaded file. If omitted, the original file name is used.',
 	},

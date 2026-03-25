@@ -24,6 +24,23 @@ export const description: INodeProperties[] = [
 		},
 		description: 'The form name or keyword to search for',
 	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		typeOptions: {
+			minValue: 1,
+			maxValue: 100,
+		},
+		default: 50,
+		displayOptions: {
+			show: {
+				resource: ['form'],
+				operation: ['getMany'],
+			},
+		},
+		description: 'Max number of results to return',
+	},
 ];
 
 interface FormSearchItem {
@@ -48,12 +65,14 @@ export async function execute(
 		});
 	}
 
+	const limit = this.getNodeParameter('limit', i) as number;
+
 	const response = (await instafillApiRequest.call(
 		this,
 		'GET',
 		'/v1/forms/search',
 		undefined,
-		{ q: query, limit: '20' },
+		{ q: query, limit: String(limit) },
 	)) as { forms: FormSearchItem[] };
 
 	const forms = response.forms || [];
