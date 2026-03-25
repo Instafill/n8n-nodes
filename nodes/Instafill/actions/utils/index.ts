@@ -11,6 +11,11 @@ export const utilsOperations: INodeProperties = {
 	name: 'operation',
 	type: 'options',
 	noDataExpression: true,
+	displayOptions: {
+		show: {
+			resource: ['utility'],
+		},
+	},
 	options: [
 		{
 			name: 'Check If Flat',

@@ -11,6 +11,7 @@ import {
 	checkIfFlat,
 	convertPdf,
 	getConversionStatus,
+	utilsOperations,
 	utilsFields,
 } from './actions/utils';
 
@@ -30,10 +31,7 @@ import {
 
 import { getForms } from './methods/loadOptions';
 
-type OperationExecuteFn = (
-	this: IExecuteFunctions,
-	i: number,
-) => Promise<INodeExecutionData[]>;
+type OperationExecuteFn = (this: IExecuteFunctions, i: number) => Promise<INodeExecutionData[]>;
 
 export class Instafill implements INodeType {
 	description: INodeTypeDescription = {
@@ -112,6 +110,7 @@ export class Instafill implements INodeType {
 			// v2: Per-resource operation selectors
 			fillsOperations,
 			formsOperations,
+			utilsOperations,
 			// Utils fields work in both v1 and v2 (operation values are unique across resources)
 			...utilsFields,
 			// v2: New resource-specific fields
@@ -141,7 +140,7 @@ export class Instafill implements INodeType {
 				checkIfFlat: checkIfFlat.execute,
 			};
 			executeFn = v1Map[operation];
-		}  else {
+		} else {
 			const resource = this.getNodeParameter('resource', 0) as string;
 			const operation = this.getNodeParameter('operation', 0) as string;
 			const v2Map: Record<string, Record<string, OperationExecuteFn>> = {
