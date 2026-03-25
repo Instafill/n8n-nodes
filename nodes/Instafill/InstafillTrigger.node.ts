@@ -48,8 +48,14 @@ export class InstafillTrigger implements INodeType {
 					{
 						name: 'Form Converted',
 						value: 'form_converted',
-						description: 'Triggers when PDF form conversion completes',
-						action: 'Triggers when PDF form conversion completes',
+						description: 'Starts when a flat-to-fillable PDF conversion completes',
+						action: 'Trigger on PDF form conversion',
+					},
+					{
+						name: 'Form Filled',
+						value: 'form_filled',
+						description: 'Starts when a form has been filled with data',
+						action: 'Trigger on form fill',
 					},
 				],
 				default: 'form_converted',
@@ -110,6 +116,11 @@ export class InstafillTrigger implements INodeType {
 
 	async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
 		const body = this.getBodyData() as IDataObject;
+		const expectedEvent = this.getNodeParameter('event') as string;
+
+		if (body.event_type && body.event_type !== expectedEvent) {
+			return {};
+		}
 
 		return {
 			workflowData: [this.helpers.returnJsonArray(body)],

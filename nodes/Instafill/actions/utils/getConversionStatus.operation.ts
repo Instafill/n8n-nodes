@@ -7,6 +7,7 @@ import type {
 import { NodeOperationError } from 'n8n-workflow';
 
 import { instafillApiRequest } from '../../shared/transport';
+import { validateObjectId } from '../../shared/validators';
 
 export const description: INodeProperties[] = [
 	{
@@ -15,7 +16,7 @@ export const description: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
-		placeholder: 'e.g., abc123def456abc123def456',
+		placeholder: 'e.g. abc123def456abc123def456',
 		displayOptions: {
 			show: {
 				operation: ['getConversionStatus'],
@@ -26,11 +27,16 @@ export const description: INodeProperties[] = [
 ];
 
 export async function execute(this: IExecuteFunctions, i: number): Promise<INodeExecutionData[]> {
-	const jobId = this.getNodeParameter('jobId', i) as string;
+	const jobIdRaw = this.getNodeParameter('jobId', i) as string;
 
-	if (!jobId.trim()) {
-		throw new NodeOperationError(this.getNode(), `The parameter 'Job ID' is empty`, {
-			description: `Please provide a valid Job ID in the 'Job ID' field to check the conversion status.`,
+	let jobId: string;
+
+	try {
+		jobId = validateObjectId(jobIdRaw, 'Job ID');
+	} catch {
+		throw new NodeOperationError(this.getNode(), 'Invalid Job ID', {
+			description:
+				'The Job ID must be a 24-character identifier. It is returned by the Convert PDF operation.',
 			itemIndex: i,
 		});
 	}
