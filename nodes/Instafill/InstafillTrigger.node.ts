@@ -51,6 +51,12 @@ export class InstafillTrigger implements INodeType {
 						description: 'Triggers when PDF form conversion completes',
 						action: 'Triggers when PDF form conversion completes',
 					},
+					{
+						name: 'Form Filled',
+						value: 'form_filled',
+						description: 'Triggers when a form is filled with data',
+						action: 'Triggers when a form is filled with data',
+					},
 				],
 				default: 'form_converted',
 				required: true,
